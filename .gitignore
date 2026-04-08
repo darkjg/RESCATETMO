@@ -1,0 +1,14 @@
+# Bloquear bases de datos y temporales
+places.sqlite*
+History*
+temp_*
+*.shm
+*.wal
+
+# Bloquear archivos de resultados y basura
+LISTA_*
+PROGRESO_*
+Nueva carpeta/
+
+# Python
+__pycache__/
