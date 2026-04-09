@@ -4,6 +4,7 @@ History*
 temp_*
 *.shm
 *.wal
+*.txt
 
 # Bloquear archivos de resultados y basura
 LISTA_*
@@ -11,5 +12,8 @@ PROGRESO_*
 Nueva carpeta/
 
 # Python
-config.py
+.env
 __pycache__/
+config.py
+# PERMITIR el ejemplo
+!.env.example

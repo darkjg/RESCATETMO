@@ -1,68 +1,68 @@
-📚 RescateTMO
+📚 RescateTMO (Chrome & Selenium Edition)
 
-RescateTMO es una herramienta automatizada en Python diseñada para recuperar tu progreso de lectura de manga, manhwa y manhua directamente desde el historial local de tus navegadores (Firefox o Google Chrome).
+RescateTMO es una herramienta automatizada en Python diseñada para recuperar, unificar y organizar tu progreso de lectura de manga. Además de analizar tu historial local, también se sincroniza directamente con tu cuenta de Nakamasweb mediante automatización real del navegador usando Selenium.
 
-Si has perdido tu cuenta o simplemente quieres una lista organizada de lo último que has leído en ZonaTMO, este script escanea tu historial, elimina duplicados, extrae el número del último capítulo y genera un reporte limpio en un archivo de texto.
+🛠️ Requisitos Previos
 
-🛠️ Requisitos Previos (Instalación)
+1. Python
 
-Para poder usar este script, necesitas tener instalado Python en tu ordenador.
+Descárgalo desde python.org. En Windows, marca la casilla “Add Python to PATH” durante la instalación.
 
-1. Instalar Python
+2. Google Chrome
 
-Si no lo tienes instalado:
+El script utiliza Selenium para emular un usuario real, por lo que necesitas tener instalado Google Chrome.
 
-Ve a la página oficial: python.org.
+3. Instalación de Dependencias
 
-Descarga e instala la última versión para tu sistema operativo.
-
-IMPORTANTE (Windows): Durante la instalación, marca la casilla que dice "Add Python to PATH". Esto permite ejecutar el script desde cualquier terminal.
-
-### 2. Instalación de Librerías
-Este script utiliza librerías nativas de Python, por lo que no requiere instalaciones complejas. Puedes verificar que todo está listo ejecutando estos comandos en tu terminal:
-
-```bash
-# Comprobar versión de Python
-# Actualizar el gestor de paquetes
-python -m pip install --upgrade pip
-
-# Instalar librerías necesarias (si decides ampliar el script)
-pip install pandas openpyxl
+Ejecuta en la terminal dentro de la carpeta del proyecto:
 ```
-🚀 Cómo usar el Script
+python -m pip install selenium webdriver-manager python-dotenv
+```
+🚀 Configuración y Uso
 
-1. Obtener los archivos de historial
+1. Configurar Credenciales (.env)
 
-Debes copiar el archivo de historial de tu navegador a la carpeta donde se encuentra RescateTMO.py:
+Busca el archivo .env.example en el proyecto.
 
-Firefox: 1. Abre Firefox y escribe about:support en la barra de direcciones.
-2. Busca Ruta del perfil y haz clic en "Abrir carpeta".
-3. Copia el archivo places.sqlite a la carpeta del script.
+Cópialo y renómbralo a .env.
 
-Google Chrome: 1. Presiona Win + R, escribe %LOCALAPPDATA%\Google\Chrome\User Data\Default\ y pulsa Enter.
-2. Busca el archivo llamado History (sin extensión) y cópialo a la carpeta del script.
+Rellena tus datos:
 
-2. Ejecución
+USER_EMAIL=tu_correo@ejemplo.com
+USER_PASS=tu_contraseña_aqui
 
-Abre una terminal en la carpeta donde están los archivos y escribe:
+2. Sincronización de Historial Local (Opcional)
+
+Chrome: copia el archivo History desde: %LOCALAPPDATA%/Google/Chrome/User Data/Default/ y pégalo junto al script.
+
+Firefox: copia places.sqlite desde tu carpeta de perfil.
+
+3. Ejecución del Script
+
+Ejecuta:
 
 python RescateTMO.py
 
+Si aparece un CAPTCHA, resuélvelo y pulsa “Acceder”. El script detectará el inicio de sesión y comenzará la extracción.
 
 📄 Resultado
 
-El script generará automáticamente un archivo llamado LISTA_TMO.txt con el siguiente formato:
+Se generará un archivo MIS_MANGAS_RESCATADOS.txt con tu información organizada, por ejemplo:
 
-[001.00] - Berserk
-[165.50] - Chainsaw Man
-[000.00] - Solo Leveling 
+--- REPORTE DE RESCATE (Total: X mangas) ---
 
+[Leídos] - Berserk
+[Pendientes] - Chainsaw Man
+[Siguiendo] - One Punch Man
+[Solo Historial] - Gantz (Cap 150.0)
 
-⚠️ Privacidad (IMPORTANTE)
+⚠️ Privacidad y Seguridad
 
-Este proyecto es de uso personal y local. Nunca subas tus archivos places.sqlite o History a GitHub ni a ningún sitio público, ya que contienen información privada de toda tu navegación web.
+El archivo .env contiene tu contraseña. Nunca lo compartas.
 
-Este repositorio incluye un archivo .gitignore para evitar que tus datos personales se suban a la nube por accidente.
+.gitignore está configurado para ignorar credenciales e historiales.
+
+Todo el proceso ocurre localmente. No se envía información a terceros.
 
 ⚖️ Licencia
 
