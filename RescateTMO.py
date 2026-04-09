@@ -16,7 +16,7 @@ load_dotenv()
 EMAIL = os.getenv("USER_EMAIL")
 PASSWORD = os.getenv("USER_PASS")
 URL_BASE = "https://zonatmo.nakamasweb.com"
-ARCHIVO_SALIDA = "MIS_MANGAS_RESCATADOS_COMPLETO.txt"
+ARCHIVO_SALIDA = "MIS_MANGAS_RESCATADOS.txt"
 
 def ejecutar_rescate():
     if not EMAIL or not PASSWORD:
