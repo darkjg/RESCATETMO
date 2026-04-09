@@ -11,4 +11,5 @@ PROGRESO_*
 Nueva carpeta/
 
 # Python
+config.py
 __pycache__/
