@@ -1,4 +1,4 @@
-<img width="840" height="360" alt="imagen" src="https://github.com/user-attachments/assets/d68df8cd-7ea8-41e9-8660-b351dcf99b1f" /># 📚 RescateTMO (Híbrido: Web + Multihistorial)
+📚 RescateTMO (Híbrido: Web + Multihistorial)
 
 **RescateTMO** es una herramienta avanzada en Python diseñada para consolidar tu progreso de lectura de manga. Esta versión sincroniza tus listas de **Nakamasweb** con tus historiales locales de **Chrome, Edge, Opera y Firefox**, generando un reporte unificado y ordenado.
 
