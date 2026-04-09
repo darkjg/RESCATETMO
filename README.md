@@ -39,13 +39,21 @@ Chrome: copia el archivo History desde: %LOCALAPPDATA%/Google/Chrome/User Data/D
 
 Firefox: copia places.sqlite desde tu carpeta de perfil.
 
-3. Ejecución del Script
+⚙️ Instrucciones de Uso (Paso a Paso)
 
-Ejecuta:
-```
-python RescateTMO.py
-```
-Si aparece un CAPTCHA, resuélvelo y pulsa “Acceder”. El script detectará el inicio de sesión y comenzará la extracción.
+Esta versión utiliza un sistema de confirmación manual para evitar errores con los captchas:
+
+    Ejecuta el script: python RescateTMO.py.
+
+    Login: Se abrirá una ventana de Chrome. El script rellenará tus datos automáticamente.
+
+    Captcha: Resuelve el captcha manualmente y haz clic en ACCEDER.
+
+    Sincronización: Una vez que estés dentro de tu perfil y veas tus mangas, vuelve a la terminal y presiona ENTER.
+
+    Automatización: El script recorrerá automáticamente las 6 secciones:
+
+        Leído, Pendiente, Siguiendo, Favorito, Lo tengo y Abandonado.
 
 📄 Formato del Reporte (MIS_MANGAS_RESCATADOS.txt)
 
