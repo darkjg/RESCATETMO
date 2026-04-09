@@ -48,7 +48,7 @@ def iniciar_sesion_web():
                 for item in items:
                     titulo = item.find_element(By.CSS_SELECTOR, ".thumbnail-title").text.strip()
                     if titulo not in mangas_web: 
-                        mangas_web[titulo] = (0.0, "Web")
+                        mangas_web[titulo] = {"cap": 0.0, "fuentes": {"Web"}}
                 try:
                     next_btn = driver.find_element(By.CSS_SELECTOR, "a[rel='next']")
                     driver.execute_script("arguments[0].click();", next_btn)
@@ -61,15 +61,12 @@ def iniciar_sesion_web():
 def extraer_de_historiales():
     """Busca en archivos locales y detecta el tipo de navegador."""
     mangas_locales = {}
-    
-    # Mapeo de archivos comunes
-    # Si usas Opera o Edge, simplemente copia su archivo 'History' aquí también
     fuentes = {
-        "History": ("Historial_Chrome/Edge/Opera", "SELECT title FROM urls WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'"),
-        "places.sqlite": ("Historial_Firefox", "SELECT title FROM moz_places WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'")
+        "History": ("Chrome/Opera", "SELECT title FROM urls WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'"),
+        "places.sqlite": ("Firefox", "SELECT title FROM moz_places WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'")
     }
 
-    for archivo, (nombre_navegador, query) in fuentes.items():
+    for archivo, (nombre_nav, query) in fuentes.items():
         if os.path.exists(archivo):
             temp_db = f"temp_{archivo}.db"
             shutil.copyfile(archivo, temp_db)
@@ -84,48 +81,55 @@ def extraer_de_historiales():
                     match = re.search(r'(.*?)\s+Capítulo\s+(\d+\.?\d*)', full_title)
                     if match:
                         nombre, cap = match.group(1).strip(), float(match.group(2))
-                        if nombre not in mangas_locales or cap > mangas_locales[nombre][0]:
-                            mangas_locales[nombre] = (cap, nombre_navegador)
                     else:
-                        nombre = full_title.split('-')[0].strip()
-                        if nombre not in mangas_locales: 
-                            mangas_locales[nombre] = (0.0, nombre_navegador)
+                        nombre, cap = full_title.split('-')[0].strip(), 0.0
+                    
+                    if nombre not in mangas_locales:
+                        mangas_locales[nombre] = {"cap": cap, "fuentes": {nombre_nav}}
+                    else:
+                        mangas_locales[nombre]["fuentes"].add(nombre_nav)
+                        if cap > mangas_locales[nombre]["cap"]:
+                            mangas_locales[nombre]["cap"] = cap
                 conn.close()
-            except Exception as e:
-                print(f" [!] Error leyendo {archivo}: {e}")
             finally:
                 if os.path.exists(temp_db): os.remove(temp_db)
     return mangas_locales
 
 def ejecutar_rescate_total():
-    print("=== INICIANDO RESCATE HÍBRIDO (WEB + MULTI-HISTORIAL) ===\n")
+    print("=== INICIANDO RESCATE TMO) ===\n")
     
+    # Obtener datos de ambas fuentes
     datos_web = iniciar_sesion_web()
     datos_locales = extraer_de_historiales()
 
-    # Combinar resultados priorizando el capítulo más alto
+    # Combinar diccionarios
     final_dict = datos_web.copy()
-    for nombre, (cap, origen) in datos_locales.items():
-        if nombre not in final_dict or cap > final_dict[nombre][0]:
-            final_dict[nombre] = (cap, origen)
+    for nombre, info in datos_locales.items():
+        if nombre not in final_dict:
+            final_dict[nombre] = info
+        else:
+            # Si ya existe, unimos las fuentes y actualizamos el capítulo si es mayor
+            final_dict[nombre]["fuentes"].update(info["fuentes"])
+            if info["cap"] > final_dict[nombre]["cap"]:
+                final_dict[nombre]["cap"] = info["cap"]
 
-    # Generar el reporte final alineado
+    # Generar el reporte final
     with open(ARCHIVO_SALIDA, "w", encoding="utf-8") as f:
-        # Cabecera
-        f.write(f"{'FUENTE DE ORIGEN':<25} | {'ESTADO':<15} | {'CAP':>6} | {'NOMBRE DEL MANGA'}\n")
-        f.write("-" * 100 + "\n")
+        f.write(f"{'FUENTE':<15} | {'ESTADO':<15} | {'CAP':>6} | {'NOMBRE DEL MANGA'}\n")
+        f.write("-" * 90 + "\n")
         
         for nombre in sorted(final_dict.keys()):
-            cap, origen = final_dict[nombre]
+            info = final_dict[nombre]
+            cap = info["cap"]
+            fuentes_lista = list(info["fuentes"])
+            
+            # Lógica de origen: si hay más de una fuente, poner "Multi-Fuente"
+            origen = "Multi-Fuente" if len(fuentes_lista) > 1 else fuentes_lista[0]
             estado = "Siguiendo" if cap > 0.0 else "Pendientes"
             
-            # Formato de salida con columnas claras
-            linea = f"{origen:<25} | {estado:<15} | {cap:>6.1f} | {nombre}\n"
-            f.write(linea)
+            f.write(f"{origen:<15} | {estado:<15} | {cap:>6.1f} | {nombre}\n")
 
-    print(f"\n [!!!] PROCESO COMPLETADO.")
-    print(f" [>] Archivo generado: {ARCHIVO_SALIDA}")
-    print(f" [>] Total consolidado: {len(final_dict)} títulos.")
+    print(f"\n [!!!] PROCESO COMPLETADO. Archivo: {ARCHIVO_SALIDA}")
 
 if __name__ == "__main__":
     ejecutar_rescate_total()
