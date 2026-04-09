@@ -28,11 +28,10 @@ Cópialo y renómbralo a .env.
 
 Rellena tus datos:
 ```markdown
-```text
+
 USER_EMAIL=tu_correo@ejemplo.com
 USER_PASS=tu_contraseña_aqui
 ```
-
 
 2. Sincronización de Historial Local (Opcional)
 
