@@ -16,7 +16,7 @@ load_dotenv()
 EMAIL = os.getenv("USER_EMAIL")
 PASSWORD = os.getenv("USER_PASS")
 URL_BASE = "https://zonatmo.nakamasweb.com"
-ARCHIVO_SALIDA = "MIS_MANGAS_RESCATADOS.txt"
+ARCHIVO_SALIDA = "MIS_MANGAS_RESCATADOS_COMPLETO.txt"
 
 def ejecutar_rescate():
     if not EMAIL or not PASSWORD:
@@ -26,66 +26,103 @@ def ejecutar_rescate():
     options = Options()
     options.add_experimental_option("detach", True)
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
+    options.add_argument("--start-maximized")
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     mangas_finales = {}
 
     try:
         driver.get(f"{URL_BASE}/login")
-        
-        # Rellenar datos automáticamente
         print(" [+] Rellenando credenciales...")
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "email"))).send_keys(EMAIL)
         driver.find_element(By.NAME, "password").send_keys(PASSWORD)
         
         print("\n" + "!"*60)
-        print(" 1. Resuelve el CAPTCHA en la ventana de Chrome.")
-        print(" 2. Haz clic en ACCEDER.")
-        print(" 3. Una vez veas TU PERFIL, vuelve aquí y PULSA ENTER.")
+        print(" 1. Resuelve el CAPTCHA y logueate.")
+        print(" 2. Cuando estés en tu perfil, vuelve aquí y PULSA ENTER.")
         print("!"*60 + "\n")
-        
-        # ESTO ES LO QUE CAMBIA: El script se para hasta que tú le des al ENTER en la consola
-        input(" >>> ¿Ya has logueado correctamente? Presiona ENTER para continuar...")
+        input(" >>> ¿Logueado? Presiona ENTER...")
 
         secciones = {
             "read": "leido",
             "pending": "pendiente",
             "follow": "siguiendo",
             "wish": "favorito",
-            "have": "lo tengo",
             "abandoned": "abandonado"
         }
 
+        mangas_a_revisar = []
+        
+        # --- FASE 1: RECOLECCIÓN DE URLS (Tu lógica original) ---
         for path, tag in secciones.items():
-            print(f" [+] Extrayendo sección web: {tag.upper()}...")
+            print(f" [+] Escaneando lista: {tag.upper()}...")
             driver.get(f"{URL_BASE}/profile/{path}")
-            time.sleep(4) # Espera generosa para carga
+            time.sleep(3)
 
             while True:
                 items = driver.find_elements(By.CSS_SELECTOR, "div.element.proyect-item")
                 for item in items:
                     try:
+                        link_el = item.find_element(By.CSS_SELECTOR, "a")
+                        url = link_el.get_attribute("href")
                         titulo = item.find_element(By.CSS_SELECTOR, ".thumbnail-title").text.strip()
-                        if titulo and titulo not in mangas_finales:
-                            mangas_finales[titulo] = {"cap": 0.0, "fuentes": {"Web"}, "estado": tag}
+                        mangas_a_revisar.append((titulo, url, tag))
                     except: continue
                 
-                # Intentar avanzar página
                 try:
                     next_btn = driver.find_elements(By.CSS_SELECTOR, "a[rel='next']")
-                    if next_btn:
+                    if next_btn and next_btn[0].is_displayed():
                         driver.execute_script("arguments[0].click();", next_btn[0])
                         time.sleep(3)
                     else: break
                 except: break
+
+        # --- FASE 2: INSPECCIÓN (Con botón "Ver todo" y Pausa) ---
+        total = len(mangas_a_revisar)
+        print(f"\n [+] Analizando {total} mangas. Pausa de 5s entre cada uno...")
         
+        for i, (titulo, url, estado) in enumerate(mangas_a_revisar, 1):
+            print(f" [{i}/{total}] Revisando: {titulo[:40]}...", end="\r")
+            cap_leido = 0.0
+            
+            try:
+                driver.get(url)
+                # Esperar a que cargue la zona de capítulos
+                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.ID, "chapters")))
+                
+                # --- NUEVO: Lógica del botón "Ver todo" ---
+                try:
+                    # Buscamos el botón ID 'show-chapters' que viste en la imagen
+                    boton_ver_todo = driver.find_element(By.ID, "show-chapters")
+                    if boton_ver_todo.is_displayed():
+                        driver.execute_script("arguments[0].click();", boton_ver_todo)
+                        time.sleep(1.5) # Espera a que se desplieguen los ocultos
+                except:
+                    pass # Si no hay botón, no pasa nada
+
+                # Buscar el ojo azul (clase 'viewed')
+                vistos = driver.find_elements(By.XPATH, "//li[contains(@class, 'list-group-item')][descendant::span[contains(@class, 'viewed')]]")
+                
+                if vistos:
+                    texto_cap = vistos[0].find_element(By.TAG_NAME, "h4").text
+                    match = re.search(r'(\d+\.?\d*)', texto_cap)
+                    if match:
+                        cap_leido = float(match.group(1))
+                
+                mangas_finales[titulo] = {"cap": cap_leido, "fuentes": {"Web"}, "estado": estado}
+                
+            except Exception:
+                mangas_finales[titulo] = {"cap": 0.0, "fuentes": {"Web (Error)"}, "estado": estado}
+
+            time.sleep(5) # PAUSA ANTI-BAN
+
         driver.quit()
 
     except Exception as e:
-        print(f" [!] Nota: Interrupción en la parte web: {e}")
+        print(f" [!] Error crítico: {e}")
 
-    # --- PROCESAR HISTORIAL LOCAL (Tus 154 mangas) ---
-    print("\n [+] Analizando bases de datos locales...")
+    # --- FASE 3: HISTORIAL LOCAL (No se borra, se mantiene igual) ---
+    print("\n [+] Analizando bases de datos locales (Chrome/Firefox/Edge)...")
     locales = extraer_de_historiales()
     for nom, info in locales.items():
         if nom not in mangas_finales:
@@ -94,25 +131,22 @@ def ejecutar_rescate():
             mangas_finales[nom]["fuentes"].update(info["fuentes"])
             if info["cap"] > mangas_finales[nom]["cap"]:
                 mangas_finales[nom]["cap"] = info["cap"]
-                if info["cap"] > 0:
-                    mangas_finales[nom]["estado"] = "leyendo"
 
-    # --- GUARDAR REPORTE ---
+    # --- GUARDAR REPORTE FINAL ---
     with open(ARCHIVO_SALIDA, "w", encoding="utf-8") as f:
         f.write(f"{'FUENTE':<18} | {'ESTADO':<12} | {'CAP':>6} | {'NOMBRE DEL MANGA'}\n")
         f.write("-" * 100 + "\n")
         for nom in sorted(mangas_finales.keys()):
             inf = mangas_finales[nom]
-            org = "Multi-Fuente" if len(inf["fuentes"]) > 1 else list(inf["fuentes"])[0]
-            f.write(f"{org:<18} | {inf['estado']:<12} | {inf['cap']:>6.1f} | {nom}\n")
+            fuente_str = "Multi-Fuente" if len(inf["fuentes"]) > 1 else list(inf["fuentes"])[0]
+            f.write(f"{fuente_str:<18} | {inf['estado']:<12} | {inf['cap']:>6.1f} | {nom}\n")
 
-    print(f"\n [!!!] PROCESO FINALIZADO.")
-    print(f" [>] Total consolidado: {len(mangas_finales)} mangas.")
+    print(f"\n [!!!] PROCESO FINALIZADO. Archivo: {ARCHIVO_SALIDA}")
 
 def extraer_de_historiales():
     mangas_locales = {}
     fuentes = {
-        "History": ("Chrome/Opera/Edge", "SELECT title FROM urls WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'"),
+        "History": ("Chrome/Edge", "SELECT title FROM urls WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'"),
         "places.sqlite": ("Firefox", "SELECT title FROM moz_places WHERE url LIKE '%zonatmo.com/viewer/%' OR url LIKE '%nakamasweb.com/viewer/%'")
     }
     for archivo, (nav, query) in fuentes.items():
@@ -129,7 +163,7 @@ def extraer_de_historiales():
                     match = re.search(r'(.*?)\s+Capítulo\s+(\d+\.?\d*)', txt)
                     nombre, cap = (match.group(1).strip(), float(match.group(2))) if match else (txt.split('-')[0].strip(), 0.0)
                     if nombre not in mangas_locales or cap > mangas_locales[nombre]["cap"]:
-                        mangas_locales[nombre] = {"cap": cap, "fuentes": {nav}, "estado": "leyendo" if cap > 0 else "pendiente"}
+                        mangas_locales[nombre] = {"cap": cap, "fuentes": {nav}, "estado": "leyendo"}
                 conn.close()
             finally:
                 if os.path.exists(temp): os.remove(temp)
