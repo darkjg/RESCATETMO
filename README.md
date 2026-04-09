@@ -27,9 +27,12 @@ Busca el archivo .env.example en el proyecto.
 Cópialo y renómbralo a .env.
 
 Rellena tus datos:
-
+```markdown
+```text
 USER_EMAIL=tu_correo@ejemplo.com
 USER_PASS=tu_contraseña_aqui
+```
+
 
 2. Sincronización de Historial Local (Opcional)
 
@@ -40,9 +43,9 @@ Firefox: copia places.sqlite desde tu carpeta de perfil.
 3. Ejecución del Script
 
 Ejecuta:
-
+```
 python RescateTMO.py
-
+```
 Si aparece un CAPTCHA, resuélvelo y pulsa “Acceder”. El script detectará el inicio de sesión y comenzará la extracción.
 
 📄 Resultado
