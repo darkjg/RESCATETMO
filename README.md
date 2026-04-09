@@ -47,20 +47,24 @@ python RescateTMO.py
 ```
 Si aparece un CAPTCHA, resuélvelo y pulsa “Acceder”. El script detectará el inicio de sesión y comenzará la extracción.
 
-📄 Formato del Reporte de Salida
+📄 Formato del Reporte (MIS_MANGAS_RESCATADOS.txt)
 
-El script generará un archivo llamado MIS_MANGAS_RESCATADOS.txt con este formato:
-FUENTE DE ORIGEN	ESTADO	CAP	NOMBRE DEL MANGA
-Web	Pendientes	0.0	Nombre del Manga A
-Historial_Chrome	Siguiendo	15.2	Nombre del Manga B
-Historial_Firefox	Siguiendo	8.0	Nombre del Manga C
-Lógica de Clasificación:
+El archivo de salida utiliza un formato de tabla limpia con las siguientes reglas:
+FUENTE	ESTADO	CAP	NOMBRE DEL MANGA
+Multi-Fuente	Siguiendo	45.0	Manga que está en Web e Historial
+Web	Pendientes	0.0	Manga solo encontrado en Nakamasweb
+Chrome/Opera	Siguiendo	12.5	Manga solo leído en este navegador
+💡 Características Especiales:
 
-    Siguiendo: Cualquier manga con un capítulo superior a 0.0 detectado en el historial.
+    Consolidación de Nombres: Si un manga aparece en varias fuentes, solo verás una línea.
 
-    Pendientes: Mangas que están en tu lista pero no tienen registro de lectura (Cap 0.0).
+    Origen "Multi-Fuente": Esta etiqueta indica que el manga se encontró en más de un sitio (ej: Web + Firefox).
 
-    Prioridad de Origen: Si un manga aparece en varias fuentes, se mostrará la fuente que tenga el capítulo más alto.
+    Capítulo Inteligente: El script compara todos los registros y se queda siempre con el capítulo más alto encontrado.
+
+    Clasificación por Capítulo: * CAP > 0.0 ➜ Siguiendo
+
+        CAP = 0.0 ➜ Pendientes
 
 ⚠️ Privacidad y Seguridad
 
