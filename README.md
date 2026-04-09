@@ -50,10 +50,11 @@ Si aparece un CAPTCHA, resuélvelo y pulsa “Acceder”. El script detectará e
 📄 Formato del Reporte (MIS_MANGAS_RESCATADOS.txt)
 
 El archivo de salida utiliza un formato de tabla limpia con las siguientes reglas:
-FUENTE	ESTADO	CAP	NOMBRE DEL MANGA
-Multi-Fuente	Siguiendo	45.0	Manga que está en Web e Historial
-Web	Pendientes	0.0	Manga solo encontrado en Nakamasweb
-Chrome/Opera	Siguiendo	12.5	Manga solo leído en este navegador
+FUENTE          | ESTADO          |  CAP  | NOMBRE DEL MANGA
+----------------------------------------------------------------------------------
+Multi-Fuente    | Siguiendo       |  45.0 | Ejemplo de manga en Web e Historial
+Web             | Pendientes      |   0.0 | Ejemplo de manga solo en Nakamasweb
+Chrome/Opera    | Siguiendo       |  12.5 | Ejemplo de manga solo en el navegador
 💡 Características Especiales:
 
     Consolidación de Nombres: Si un manga aparece en varias fuentes, solo verás una línea.
