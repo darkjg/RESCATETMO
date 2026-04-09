@@ -1,20 +1,20 @@
-📚 RescateTMO (Chrome & Selenium Edition)
+# 📚 RescateTMO (Híbrido: Web + Multihistorial)
 
-RescateTMO es una herramienta automatizada en Python diseñada para recuperar, unificar y organizar tu progreso de lectura de manga. Además de analizar tu historial local, también se sincroniza directamente con tu cuenta de Nakamasweb mediante automatización real del navegador usando Selenium.
+**RescateTMO** es una herramienta avanzada en Python diseñada para consolidar tu progreso de lectura de manga. Esta versión sincroniza tus listas de **Nakamasweb** con tus historiales locales de **Chrome, Edge, Opera y Firefox**, generando un reporte unificado y ordenado.
 
-🛠️ Requisitos Previos
+---
 
-1. Python
+## 🛠️ Requisitos Previos
 
-Descárgalo desde python.org. En Windows, marca la casilla “Add Python to PATH” durante la instalación.
+### 1. Instalar Python
+Descárgalo en [python.org](https://www.python.org/). 
+> **IMPORTANTE:** Durante la instalación, marca la casilla **"Add Python to PATH"**.
 
-2. Google Chrome
+### 2. Navegador Google Chrome
+El script utiliza **Selenium** para la parte web, por lo que requiere tener Chrome instalado.
 
-El script utiliza Selenium para emular un usuario real, por lo que necesitas tener instalado Google Chrome.
-
-3. Instalación de Dependencias
-
-Ejecuta en la terminal dentro de la carpeta del proyecto:
+### 3. Instalación de Librerías
+Abre una terminal en la carpeta del proyecto y ejecuta:
 ```
 python -m pip install selenium webdriver-manager python-dotenv
 ```
@@ -47,16 +47,20 @@ python RescateTMO.py
 ```
 Si aparece un CAPTCHA, resuélvelo y pulsa “Acceder”. El script detectará el inicio de sesión y comenzará la extracción.
 
-📄 Resultado
+📄 Formato del Reporte de Salida
 
-Se generará un archivo MIS_MANGAS_RESCATADOS.txt con tu información organizada, por ejemplo:
+El script generará un archivo llamado MIS_MANGAS_RESCATADOS.txt con este formato:
+FUENTE DE ORIGEN	ESTADO	CAP	NOMBRE DEL MANGA
+Web	Pendientes	0.0	Nombre del Manga A
+Historial_Chrome	Siguiendo	15.2	Nombre del Manga B
+Historial_Firefox	Siguiendo	8.0	Nombre del Manga C
+Lógica de Clasificación:
 
---- REPORTE DE RESCATE (Total: X mangas) ---
+    Siguiendo: Cualquier manga con un capítulo superior a 0.0 detectado en el historial.
 
-[Leídos] - Berserk
-[Pendientes] - Chainsaw Man
-[Siguiendo] - One Punch Man
-[Solo Historial] - Gantz (Cap 150.0)
+    Pendientes: Mangas que están en tu lista pero no tienen registro de lectura (Cap 0.0).
+
+    Prioridad de Origen: Si un manga aparece en varias fuentes, se mostrará la fuente que tenga el capítulo más alto.
 
 ⚠️ Privacidad y Seguridad
 
