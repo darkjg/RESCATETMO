@@ -1,4 +1,4 @@
-# 📚 RescateTMO (Híbrido: Web + Multihistorial)
+<img width="840" height="360" alt="imagen" src="https://github.com/user-attachments/assets/d68df8cd-7ea8-41e9-8660-b351dcf99b1f" /># 📚 RescateTMO (Híbrido: Web + Multihistorial)
 
 **RescateTMO** es una herramienta avanzada en Python diseñada para consolidar tu progreso de lectura de manga. Esta versión sincroniza tus listas de **Nakamasweb** con tus historiales locales de **Chrome, Edge, Opera y Firefox**, generando un reporte unificado y ordenado.
 
@@ -43,17 +43,19 @@ Firefox: copia places.sqlite desde tu carpeta de perfil.
 
 Esta versión utiliza un sistema de confirmación manual para evitar errores con los captchas:
 
-    Ejecuta el script: python RescateTMO.py.
+ Ejecuta el script:
+ ```
+ python RescateTMO.py.
+```
+Login: Se abrirá una ventana de Chrome. El script rellenará tus datos automáticamente.
 
-    Login: Se abrirá una ventana de Chrome. El script rellenará tus datos automáticamente.
+Captcha: Resuelve el captcha manualmente y haz clic en ACCEDER.
 
-    Captcha: Resuelve el captcha manualmente y haz clic en ACCEDER.
+Sincronización: Una vez que estés dentro de tu perfil y veas tus mangas, vuelve a la terminal y presiona ENTER.
 
-    Sincronización: Una vez que estés dentro de tu perfil y veas tus mangas, vuelve a la terminal y presiona ENTER.
+Automatización: El script recorrerá automáticamente las 6 secciones:
 
-    Automatización: El script recorrerá automáticamente las 6 secciones:
-
-        Leído, Pendiente, Siguiendo, Favorito, Lo tengo y Abandonado.
+    Leído, Pendiente, Siguiendo, Favorito, Lo tengo y Abandonado.
 
 📄 Formato del Reporte (MIS_MANGAS_RESCATADOS.txt)
 
